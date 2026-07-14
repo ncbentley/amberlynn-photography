@@ -1,5 +1,24 @@
 import { defineCollection, reference, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { readdirSync } from 'node:fs';
+
+// Astro resolves reference() lazily, which lets a shoot pointing at a
+// missing category build silently and just vanish from the site. Check
+// eagerly against the actual files so a typo fails the build instead.
+const categoryIds = readdirSync(new URL('./content/categories', import.meta.url))
+  .filter((f) => f.endsWith('.md'))
+  .map((f) => f.replace(/\.md$/, ''));
+
+const existingCategory = () =>
+  reference('categories').superRefine((val, ctx) => {
+    const id = typeof val === 'string' ? val : (val as { id?: string })?.id;
+    if (id && !categoryIds.includes(id)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `category "${id}" does not exist — valid categories: ${categoryIds.join(', ')}`,
+      });
+    }
+  });
 
 /**
  * The editing contract. Content that doesn't match these schemas fails the
@@ -43,7 +62,7 @@ const shoots = defineCollection({
     z
       .object({
         title: z.string(),
-        category: reference('categories'),
+        category: existingCategory(),
         date: z.coerce.date(),
         cover: image(),
         images: z

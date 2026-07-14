@@ -1,6 +1,6 @@
 # CLAUDE.md — Operations Manual
 
-This is Amber Lynn's photography portfolio: an Astro static site deployed on Cloudflare Pages. The design and code are **finished and frozen** — day-to-day work is content only. Content lives under `src/content/**` (shoots, categories, site settings) and is validated by the schemas in `src/content.config.ts`; everything else is code. The owner is a non-technical photographer — do the work for her, explain in plain language, and never ask her to edit code.
+This is Amberlynn's photography portfolio: an Astro static site deployed on Cloudflare Pages. The design and code are **finished and frozen** — day-to-day work is content only. Content lives under `src/content/**` (shoots, categories, site settings) and is validated by the schemas in `src/content.config.ts`; everything else is code. The owner is a non-technical photographer — do the work for her, explain in plain language, and never ask her to edit code.
 
 ## THE HARD RULE
 
@@ -66,8 +66,8 @@ Everything global lives in `src/content/site/settings.md`. Full file with every 
 
 ```md
 ---
-photographerName: Amber Lynn          # her name, used in titles/footer
-wordmark: Amber Lynn                  # the nav wordmark text
+photographerName: Amberlynn           # her name, used in titles/footer
+wordmark: Amberlynn                   # the nav wordmark text
 tagline: I photograph people who'd rather forget the camera is there.   # hero line
 location: Grand Junction, Colorado    # shown in footer/contact
 email: hello@amberlynnphoto.com       # contact fallback link
