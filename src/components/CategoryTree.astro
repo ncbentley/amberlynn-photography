@@ -26,6 +26,15 @@ const { items } = Astro.props;
 
 <script is:inline>
   (function () {
+    // This script runs mid-parse, before the category sections below it
+    // exist in the DOM — wait for the full document before wiring up.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+    function init() {
     var tree = document.querySelector('[data-category-tree]');
     if (!tree || !('IntersectionObserver' in window)) return;
 
@@ -77,6 +86,7 @@ const { items } = Astro.props;
         }
       });
     });
+    }
   })();
 </script>
 
