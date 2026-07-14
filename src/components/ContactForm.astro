@@ -1,0 +1,119 @@
+---
+interface Props {
+  formspreeId: string;
+  email: string;
+}
+
+const { formspreeId, email } = Astro.props;
+
+const eventTypes = ['Wedding', 'Engagement', 'Family', 'Seniors & Prom', 'Something else'];
+---
+
+<form class="contact-form" action={`https://formspree.io/f/${formspreeId}`} method="POST">
+  <p class="hp" aria-hidden="true">
+    <label>
+      Leave this field empty
+      <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+    </label>
+  </p>
+
+  <div class="field">
+    <label class="eyebrow" for="cf-name">Name</label>
+    <input id="cf-name" type="text" name="name" required autocomplete="name" />
+  </div>
+
+  <div class="field">
+    <label class="eyebrow" for="cf-email">Email</label>
+    <input id="cf-email" type="email" name="email" required autocomplete="email" />
+  </div>
+
+  <div class="field">
+    <label class="eyebrow" for="cf-type">Event type</label>
+    <select id="cf-type" name="event_type">
+      {eventTypes.map((t) => <option value={t}>{t}</option>)}
+    </select>
+  </div>
+
+  <div class="field">
+    <label class="eyebrow" for="cf-date">Date <span class="optional">(optional)</span></label>
+    <input id="cf-date" type="date" name="date" />
+  </div>
+
+  <div class="field">
+    <label class="eyebrow" for="cf-message">Message</label>
+    <textarea id="cf-message" name="message" rows="6" required></textarea>
+  </div>
+
+  <button type="submit">Send inquiry</button>
+
+  <p class="fallback">
+    Prefer email? <a href={`mailto:${email}`}>{email}</a>
+  </p>
+</form>
+
+<style>
+  .contact-form {
+    display: grid;
+    gap: 1.4rem;
+  }
+
+  /* Honeypot: parked far off-canvas, skipped by keyboards and readers. */
+  .hp {
+    position: absolute;
+    left: -100vw;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .field {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .optional {
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 400;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    font: inherit;
+    color: var(--ink);
+    background: var(--shade);
+    border: 1px solid color-mix(in srgb, var(--umber) 28%, transparent);
+    border-radius: 2px;
+    padding: 0.6em 0.75em;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  button {
+    justify-self: start;
+    font: inherit;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--paper);
+    background: var(--ink);
+    border: none;
+    border-radius: 2px;
+    padding: 0.8em 1.8em;
+    cursor: pointer;
+    transition: background-color 150ms ease;
+  }
+
+  button:hover {
+    background: color-mix(in srgb, var(--ink) 78%, var(--gold));
+  }
+
+  .fallback {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--umber);
+  }
+</style>

@@ -4,17 +4,20 @@ import '@fontsource-variable/karla';
 import '@fontsource-variable/karla/wght-italic.css';
 import '../styles/global.css';
 import { getEntry } from 'astro:content';
+import Nav from '../components/Nav.astro';
 
 interface Props {
   title: string;
   description?: string;
+  transparentNav?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, transparentNav = false } = Astro.props;
 const settings = await getEntry('site', 'settings');
 if (!settings) throw new Error('Missing src/content/site/settings.md');
 const s = settings.data;
 const pageTitle = title ? `${title} — ${s.wordmark}` : s.wordmark;
+const instagramHandle = s.instagram.replace(/^@/, '');
 ---
 
 <!doctype html>
@@ -26,22 +29,78 @@ const pageTitle = title ? `${title} — ${s.wordmark}` : s.wordmark;
     <meta name="description" content={description ?? `${s.wordmark} — ${s.tagline}`} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="generator" content={Astro.generator} />
+    <script is:inline>
+      // Marks JS availability early so no-JS visitors never get hidden
+      // content or an unreadable transparent nav.
+      document.documentElement.classList.add('js');
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <header>
-      <nav aria-label="Main">
-        <a href="/">{s.wordmark}</a>
-        <a href="/gallery">Gallery</a>
-        <a href="/contact">Contact</a>
-      </nav>
-    </header>
-    <main id="main">
+    <Nav transparent={transparentNav} />
+    <main id="main" class:list={[{ 'below-nav': !transparentNav }]}>
       <slot />
     </main>
     <footer>
-      <p>{s.photographerName} · {s.location}</p>
-      <p><a href={`mailto:${s.email}`}>{s.email}</a> · <a href={`https://instagram.com/${s.instagram.replace(/^@/, '')}`}>{s.instagram}</a></p>
+      <div class="footer-inner">
+        <div class="footer-id">
+          <p class="footer-wordmark">{s.wordmark}</p>
+          <p class="footer-location">{s.location}</p>
+        </div>
+        <div class="footer-links">
+          <a href={`mailto:${s.email}`}>{s.email}</a>
+          <a href={`https://instagram.com/${instagramHandle}`}>{s.instagram}</a>
+        </div>
+      </div>
     </footer>
   </body>
 </html>
+
+<style>
+  main.below-nav {
+    padding-top: var(--nav-h);
+  }
+
+  footer {
+    background: var(--shade);
+    padding: clamp(2.5rem, 6vw, 4rem) var(--space-gutter);
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem 3rem;
+    max-width: 1400px;
+    margin-inline: auto;
+  }
+
+  .footer-wordmark {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .footer-location {
+    margin: 0.35rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--umber);
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 2rem;
+    font-size: 0.9375rem;
+  }
+
+  .footer-links a {
+    color: var(--umber);
+  }
+
+  .footer-links a:hover {
+    color: var(--ink);
+  }
+</style>

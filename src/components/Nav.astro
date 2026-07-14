@@ -1,0 +1,132 @@
+---
+import { getEntry } from 'astro:content';
+
+interface Props {
+  transparent?: boolean;
+}
+
+const { transparent = false } = Astro.props;
+const settings = await getEntry('site', 'settings');
+if (!settings) throw new Error('Missing src/content/site/settings.md');
+const s = settings.data;
+---
+
+<header class:list={['site-nav', { 'is-transparent': transparent }]}>
+  <nav aria-label="Main">
+    <a class="wordmark" href="/">{s.wordmark}</a>
+    <div class="links">
+      <a href="/gallery">Gallery</a>
+      <a href="/contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+{
+  transparent && (
+    <script is:inline>
+      (function () {
+        var nav = document.querySelector('.site-nav.is-transparent');
+        if (!nav) return;
+        var update = function () {
+          nav.classList.toggle('is-scrolled', window.scrollY > window.innerHeight * 0.85);
+        };
+        window.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update, { passive: true });
+        update();
+      })();
+    </script>
+  )
+}
+
+<style>
+  .site-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 60;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--paper) 84%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+
+  /* Scrim for the transparent (over-hero) state. Sits behind the text and
+     fades a little past the bar so it never reads as a hard edge. */
+  .site-nav::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: calc(100% + 3.5rem);
+    background: linear-gradient(to bottom, rgba(20, 16, 12, 0.55), rgba(20, 16, 12, 0));
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+    transition: opacity 200ms ease;
+  }
+
+  /* Transparent state only applies when JS is available to swap it back
+     after scrolling — without JS every page gets the solid, readable bar. */
+  :global(html.js) .site-nav.is-transparent:not(.is-scrolled) {
+    color: var(--paper);
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  :global(html.js) .site-nav.is-transparent:not(.is-scrolled)::before {
+    opacity: 1;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: var(--nav-h);
+    padding-inline: var(--space-gutter);
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.1rem, 3vw, 2.25rem);
+  }
+
+  .links a {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: inherit;
+    transition: color 150ms ease;
+  }
+
+  .links a:hover {
+    color: var(--gold);
+  }
+
+  :global(html.js) .site-nav.is-transparent:not(.is-scrolled) .links a:hover {
+    color: var(--gold-soft);
+  }
+
+  @media (max-width: 639px) {
+    .wordmark {
+      font-size: 1.1rem;
+    }
+  }
+</style>

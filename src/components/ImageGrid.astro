@@ -1,0 +1,111 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  images: { src: ImageMetadata; alt: string }[];
+  variant?: 'masonry' | 'editorial' | 'full';
+  eager?: number;
+}
+
+const { images, variant = 'masonry', eager = 0 } = Astro.props;
+
+const widthsFor: Record<string, number[]> = {
+  masonry: [480, 768, 1080],
+  editorial: [640, 1080, 1600],
+  full: [768, 1280, 1920],
+};
+
+const sizesFor: Record<string, string> = {
+  masonry: '(min-width: 1024px) 31vw, (min-width: 640px) 47vw, 100vw',
+  editorial: '(min-width: 900px) 62vw, 100vw',
+  full: '(min-width: 1200px) 1100px, 100vw',
+};
+---
+
+<div class:list={['image-grid', variant]}>
+  {
+    images.map((img, i) => (
+      <div class="cell">
+        <Image
+          src={img.src}
+          alt={img.alt}
+          widths={widthsFor[variant]}
+          sizes={sizesFor[variant]}
+          loading={i < eager ? 'eager' : 'lazy'}
+        />
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  /* Photos sit directly on paper: no radius, no shadows, no borders. */
+  .cell :global(img) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Masonry — CSS columns, natural heights ------------------------- */
+  .masonry {
+    column-gap: 1.5rem;
+  }
+
+  .masonry .cell {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .masonry {
+      columns: 2;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .masonry {
+      columns: 3;
+    }
+  }
+
+  /* Editorial — asymmetric 12-column grid with deliberate air ------- */
+  .editorial {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: clamp(1rem, 2.5vw, 2rem);
+    row-gap: clamp(2.5rem, 7vw, 5.5rem);
+  }
+
+  .editorial .cell {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 900px) {
+    .editorial .cell:nth-child(4n + 1) {
+      grid-column: 1 / span 8;
+    }
+
+    .editorial .cell:nth-child(4n + 2) {
+      grid-column: 9 / span 4;
+      margin-top: clamp(3rem, 9vw, 7rem);
+    }
+
+    .editorial .cell:nth-child(4n + 3) {
+      grid-column: 1 / span 5;
+    }
+
+    .editorial .cell:nth-child(4n + 4) {
+      grid-column: 7 / span 6;
+      margin-top: clamp(2rem, 6vw, 4.5rem);
+    }
+  }
+
+  /* Full — one column, near-full width, big breathing room ---------- */
+  .full {
+    max-width: 1100px;
+    margin-inline: auto;
+    display: grid;
+    row-gap: clamp(3rem, 8vw, 6rem);
+  }
+</style>

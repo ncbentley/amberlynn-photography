@@ -1,12 +1,212 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getEntry } from 'astro:content';
+import Hero from '../components/Hero.astro';
+import { getCollection, getEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import { byDateDesc } from '../lib/shoots';
 
 const settings = await getEntry('site', 'settings');
-const s = settings!.data;
+if (!settings) throw new Error('Missing src/content/site/settings.md');
+const s = settings.data;
+
+const categories = await getCollection('categories');
+const categoryById = new Map(categories.map((c) => [c.id, c]));
+
+// Up to 4 featured covers, newest first, at most one per category when possible.
+const featuredShoots = (await getCollection('shoots', (e) => e.data.featured)).sort(byDateDesc);
+const picked: typeof featuredShoots = [];
+const seenCategories = new Set<string>();
+for (const shoot of featuredShoots) {
+  if (seenCategories.has(shoot.data.category.id)) continue;
+  seenCategories.add(shoot.data.category.id);
+  picked.push(shoot);
+  if (picked.length === 4) break;
+}
+if (picked.length < 4) {
+  for (const shoot of featuredShoots) {
+    if (picked.includes(shoot)) continue;
+    picked.push(shoot);
+    if (picked.length === 4) break;
+  }
+}
 ---
 
-<Base title="" description={s.tagline}>
-  <h1>{s.wordmark}</h1>
-  <p>{s.tagline}</p>
+<Base title="" description={s.tagline} transparentNav>
+  <Hero image={s.heroImage} alt={s.heroAlt} tagline={s.tagline} />
+
+  <section class="intro">
+    <h1>I make photographs that feel the way the day actually felt.</h1>
+    <p>
+      I'm based in {s.location}, and most of my favorite frames happen in the last hour of sun —
+      unposed, unhurried, a little windblown. If you'd rather spend a session laughing with your
+      people than looking at a lens, we'll get along.
+    </p>
+  </section>
+
+  {
+    picked.length > 0 && (
+      <section class="featured" aria-label="Featured work">
+        <div class="featured-grid">
+          {picked.map((shoot) => {
+            const category = categoryById.get(shoot.data.category.id);
+            return (
+              <a class="feat-item" href={`/gallery/${shoot.data.category.id}`}>
+                <Image
+                  src={shoot.data.cover}
+                  alt={`${shoot.data.title} — ${category?.data.displayName ?? shoot.data.category.id}`}
+                  widths={[480, 828, 1280, 1600]}
+                  sizes="(min-width: 900px) 60vw, 100vw"
+                  loading="lazy"
+                />
+                <span class="eyebrow">{category?.data.displayName ?? shoot.data.category.id}</span>
+                <span class="feat-title">{shoot.data.title}</span>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="cta">
+    <p class="cta-line">
+      Planning something — a wedding, a season, an ordinary Tuesday worth keeping?
+    </p>
+    <a class="cta-link" href="/contact">Tell me about your day →</a>
+  </section>
 </Base>
+
+<style>
+  .intro {
+    padding: var(--space-section) var(--space-gutter);
+    max-width: 1100px;
+    margin-inline: auto;
+  }
+
+  .intro h1 {
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    max-width: 24ch;
+  }
+
+  .intro p {
+    margin-top: 2rem;
+    max-width: var(--measure);
+    color: var(--umber);
+  }
+
+  .featured {
+    padding: 0 var(--space-gutter) var(--space-section);
+    max-width: 1400px;
+    margin-inline: auto;
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: clamp(1rem, 2.5vw, 2rem);
+    row-gap: clamp(3rem, 8vw, 6rem);
+  }
+
+  .feat-item {
+    grid-column: 1 / -1;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .feat-item :global(img) {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .feat-item .eyebrow {
+    display: block;
+    margin-top: 1rem;
+  }
+
+  .feat-title {
+    display: inline-block;
+    margin-top: 0.3rem;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    line-height: 1.2;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color 150ms ease;
+  }
+
+  .feat-item:hover .feat-title {
+    text-decoration-color: var(--gold);
+  }
+
+  @media (min-width: 900px) {
+    .feat-item:nth-child(4n + 1) {
+      grid-column: 1 / span 8;
+    }
+
+    .feat-item:nth-child(4n + 1) :global(img) {
+      aspect-ratio: 3 / 2;
+    }
+
+    .feat-item:nth-child(4n + 2) {
+      grid-column: 9 / span 4;
+      margin-top: clamp(3rem, 9vw, 7rem);
+    }
+
+    .feat-item:nth-child(4n + 2) :global(img) {
+      aspect-ratio: 4 / 5;
+    }
+
+    .feat-item:nth-child(4n + 3) {
+      grid-column: 1 / span 5;
+    }
+
+    .feat-item:nth-child(4n + 3) :global(img) {
+      aspect-ratio: 4 / 5;
+    }
+
+    .feat-item:nth-child(4n + 4) {
+      grid-column: 7 / span 6;
+      margin-top: clamp(2rem, 6vw, 4.5rem);
+    }
+
+    .feat-item:nth-child(4n + 4) :global(img) {
+      aspect-ratio: 3 / 2;
+    }
+  }
+
+  .cta {
+    background: var(--shade);
+    padding: var(--space-section) var(--space-gutter);
+    text-align: center;
+  }
+
+  .cta-line {
+    margin: 0 auto;
+    max-width: 34ch;
+    font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+    font-weight: 300;
+    line-height: 1.4;
+    text-wrap: balance;
+  }
+
+  .cta-link {
+    display: inline-block;
+    margin-top: 1.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+    padding-bottom: 0.2em;
+    transition: border-color 150ms ease;
+  }
+
+  .cta-link:hover {
+    border-bottom-color: var(--gold);
+  }
+</style>

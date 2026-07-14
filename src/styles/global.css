@@ -16,6 +16,7 @@
   --measure: 62ch;
   --space-gutter: clamp(1.25rem, 4vw, 3rem);
   --space-section: clamp(4rem, 10vw, 8rem);
+  --nav-h: 4.25rem;
 }
 
 /* Reset ------------------------------------------------------------ */
@@ -99,6 +100,19 @@ a:hover {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--umber);
+}
+
+/* Utility: visually hidden but available to assistive tech ----------- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

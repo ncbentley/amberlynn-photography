@@ -1,16 +1,75 @@
 ---
 import Base from '../layouts/Base.astro';
+import ContactForm from '../components/ContactForm.astro';
 import { getEntry } from 'astro:content';
 
 const settings = await getEntry('site', 'settings');
-const s = settings!.data;
+if (!settings) throw new Error('Missing src/content/site/settings.md');
+const s = settings.data;
+const instagramHandle = s.instagram.replace(/^@/, '');
 ---
 
-<Base title="Contact">
-  <h1>Contact</h1>
-  <p>{s.pricingLine}</p>
-  <form action={`https://formspree.io/f/${s.formspreeId}`} method="POST">
-    <label>Name <input type="text" name="name" required /></label>
-    <button type="submit">Send</button>
-  </form>
+<Base title="Contact" description={`Inquire about a session with ${s.photographerName}.`}>
+  <div class="contact-page">
+    <div class="cols">
+      <div class="left">
+        <h1>Tell me about your day.</h1>
+        <p>
+          A date, a place, the people who'll be there — that's plenty to start. I'll write back
+          within a couple of days, usually sooner, and we'll figure out the rest together.
+        </p>
+        <ul class="reach">
+          <li><a href={`mailto:${s.email}`}>{s.email}</a></li>
+          <li><a href={`https://instagram.com/${instagramHandle}`}>{s.instagram}</a></li>
+        </ul>
+        <p class="pricing">{s.pricingLine}</p>
+      </div>
+      <div class="right">
+        <ContactForm formspreeId={s.formspreeId} email={s.email} />
+      </div>
+    </div>
+  </div>
 </Base>
+
+<style>
+  .contact-page {
+    padding: clamp(2rem, 5vw, 4rem) var(--space-gutter) var(--space-section);
+    max-width: 1100px;
+    margin-inline: auto;
+  }
+
+  .cols {
+    display: grid;
+    gap: clamp(3rem, 7vw, 5rem);
+  }
+
+  @media (min-width: 768px) {
+    .cols {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.25rem);
+  }
+
+  .left > p {
+    margin-top: 1.5rem;
+    color: var(--umber);
+  }
+
+  .reach {
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .pricing {
+    margin-top: 2rem;
+    font-style: italic;
+    color: var(--umber);
+  }
+</style>

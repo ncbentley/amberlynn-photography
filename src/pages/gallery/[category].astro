@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
+import ImageGrid from '../../components/ImageGrid.astro';
+import { getCollection, render } from 'astro:content';
 import { byDateDesc } from '../../lib/shoots';
 
 export async function getStaticPaths() {
@@ -13,22 +13,99 @@ export async function getStaticPaths() {
 }
 
 const { category } = Astro.props;
+
 const shoots = (
   await getCollection('shoots', (s) => s.data.category.id === category.id)
 ).sort(byDateDesc);
+
+const rendered = await Promise.all(
+  shoots.map(async (shoot) => ({ shoot, Content: (await render(shoot)).Content }))
+);
+
+const monthYear = new Intl.DateTimeFormat('en-US', {
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
 ---
 
-<Base title={category.data.displayName}>
-  <h1>{category.data.displayName}</h1>
-  <p>{category.data.blurb}</p>
-  {
-    shoots.map((shoot) => (
-      <article>
-        <h2>{shoot.data.title}</h2>
-        {shoot.data.images.map((img) => (
-          <Image src={img.src} alt={img.alt} widths={[480, 960, 1600]} sizes="100vw" loading="lazy" />
-        ))}
-      </article>
-    ))
-  }
+<Base title={category.data.displayName} description={category.data.blurb}>
+  <div class="category-page">
+    <p class="back">
+      <a href="/gallery">← All work</a>
+    </p>
+    <header class="page-head">
+      <h1>{category.data.displayName}</h1>
+      <p class="blurb">{category.data.blurb}</p>
+    </header>
+
+    {
+      rendered.map(({ shoot, Content }) => (
+        <article class="shoot">
+          <header class="shoot-head">
+            <p class="eyebrow">{monthYear.format(shoot.data.date)}</p>
+            <h2>{shoot.data.title}</h2>
+          </header>
+          <div class="story">
+            <Content />
+          </div>
+          <ImageGrid images={shoot.data.images} variant={shoot.data.layout_hint} />
+        </article>
+      ))
+    }
+  </div>
 </Base>
+
+<style>
+  .category-page {
+    padding: clamp(1.5rem, 4vw, 3rem) var(--space-gutter) var(--space-section);
+    max-width: 1400px;
+    margin-inline: auto;
+  }
+
+  .back {
+    margin: 0 0 clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .back a {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--umber);
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+
+  .back a:hover {
+    color: var(--gold);
+  }
+
+  .page-head h1 {
+    font-size: clamp(2.5rem, 6vw, 4.25rem);
+  }
+
+  .blurb {
+    margin-top: 1rem;
+    color: var(--umber);
+    max-width: var(--measure);
+  }
+
+  .shoot {
+    margin-top: var(--space-section);
+  }
+
+  .shoot-head h2 {
+    margin-top: 0.4rem;
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  }
+
+  .story {
+    margin: 1.5rem 0 clamp(2rem, 4vw, 3rem);
+    max-width: var(--measure);
+  }
+
+  .story :global(p + p) {
+    margin-top: 1em;
+  }
+</style>
