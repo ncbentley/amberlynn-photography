@@ -24,9 +24,9 @@ date: 2026-06-20
 cover: ./01.webp
 images:
   - src: ./01.webp
-    alt: EDIT ME: describe this photo
+    alt: "EDIT ME: describe this photo"
   - src: ./02.webp
-    alt: EDIT ME: describe this photo
+    alt: "EDIT ME: describe this photo"
 layout_hint: masonry
 featured: false
 ---
