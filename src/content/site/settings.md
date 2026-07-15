@@ -1,10 +1,11 @@
 ---
 photographerName: Amberlynn
 wordmark: Amberlynn
-tagline: I photograph people who'd rather forget the camera is there.
+tagline: making visions comes to life
 location: Grand Junction, Colorado
-email: hello@amberlynnphoto.com
-instagram: "@amberlynn.photo"
+email: Amberlynnlafae@gmail.com
+instagram: "@amberlynn_lafae_photography"
+tiktok: "@Amberlynn_lafae_photog_"
 formspreeId: YOUR_FORM_ID
 pricingLine: Sessions from $150 — inquire for details.
 heroImage: ./hero.webp

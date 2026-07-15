@@ -36,6 +36,7 @@ const site = defineCollection({
         location: z.string(),
         email: z.string().email(),
         instagram: z.string(),
+        tiktok: z.string(),
         formspreeId: z.string(),
         pricingLine: z.string(),
         heroImage: image(),
