@@ -53,13 +53,17 @@ if (picked.length < 4) {
               <a class="feat-item" href={`/gallery/${shoot.data.category.id}`}>
                 <Image
                   src={shoot.data.cover}
-                  alt={`${shoot.data.title} — ${category?.data.displayName ?? shoot.data.category.id}`}
+                  alt={
+                    shoot.data.title
+                      ? `${shoot.data.title} — ${category?.data.displayName ?? shoot.data.category.id}`
+                      : (category?.data.displayName ?? shoot.data.category.id)
+                  }
                   widths={[480, 828, 1280, 1600]}
                   sizes="(min-width: 900px) 60vw, 100vw"
                   loading="lazy"
                 />
                 <span class="eyebrow">{category?.data.displayName ?? shoot.data.category.id}</span>
-                <span class="feat-title">{shoot.data.title}</span>
+                {shoot.data.title && <span class="feat-title">{shoot.data.title}</span>}
               </a>
             );
           })}
