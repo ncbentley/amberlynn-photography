@@ -69,11 +69,10 @@ on the site.
      handle-stripping as `Base.astro`/`contact.astro`)
   5. TikTok → `https://www.tiktok.com/${s.tiktok}`
   6. Facebook → `s.facebook`
-- Button labels: "Gallery", "Contact", "Email", the Instagram handle
-  (`s.instagram`), the TikTok handle (`s.tiktok`), "Facebook" — matching how
-  each link's text already reads elsewhere on the site (Gallery/Contact are
-  plain nav-style labels; Instagram/TikTok show the handle; Facebook shows
-  the fixed label per the decision above).
+- Button labels: "Gallery", "Contact", "Email", "Instagram", "TikTok",
+  "Facebook" — all three social links use their fixed label as visible text
+  (see the post-implementation update above); only the `href` uses the
+  handle/URL.
 - Page title: "Links — Amberlynn" (via the `Base` layout's `title` prop,
   consistent with how other pages set their title).
 
@@ -83,9 +82,8 @@ on the site.
 - No bio text, profile photo, or custom visual theme for `/links` — it reuses
   the site's existing look via `Base`.
 - No per-photo or per-shoot changes — this is site-settings and layout only.
-- No change to the existing Instagram/TikTok display pattern (handle as
-  visible text) — only Facebook gets the fixed-label treatment, since only
-  Facebook lacks a clean handle.
+- No change to link `href` targets — the post-implementation label change
+  (see Decisions) only affects visible text, not what the links point to.
 
 ## Testing / verification
 
