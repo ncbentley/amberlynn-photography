@@ -26,9 +26,14 @@ on the site.
   <name>/<numeric-id>/` URL with no clean handle to extract, so `facebook`
   is stored as the complete URL and used as-is.
 - **Facebook's visible link text is the fixed label "Facebook"**, not the
-  URL itself — unlike Instagram/TikTok, which display the handle as the
-  link text. A raw `/people/.../61566921280369/` URL would look wrong as
+  URL itself. A raw `/people/.../61566921280369/` URL would look wrong as
   visible text.
+- **Update (post-implementation):** the site owner asked, after Facebook
+  shipped, to make Instagram and TikTok match — fixed labels ("Instagram",
+  "TikTok") instead of the handle as visible text. All three social links
+  now use the same fixed-label pattern everywhere they appear (footer,
+  contact page, `/links`). The `href` still uses the handle/URL as before —
+  only the visible text changed.
 - **The stored Facebook URL is the canonical page URL, tracking params
   stripped.** The URL the photographer provided included Facebook's
   share-tracking query string (`?mibextid=...&rdid=...&share_url=...`),
