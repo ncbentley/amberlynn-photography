@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import { getEntry } from 'astro:content';
+
+const settings = await getEntry('site', 'settings');
+if (!settings) throw new Error('Missing src/content/site/settings.md');
+const s = settings.data;
+const instagramHandle = s.instagram.replace(/^@/, '');
+
+const links = [
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/contact', label: 'Contact' },
+  { href: `mailto:${s.email}`, label: 'Email' },
+  { href: `https://instagram.com/${instagramHandle}`, label: 'Instagram' },
+  { href: `https://www.tiktok.com/${s.tiktok}`, label: 'TikTok' },
+  { href: s.facebook, label: 'Facebook' },
+];
+---
+
+<Base title="Links" description={`Find ${s.photographerName} online.`}>
+  <div class="links-page">
+    <h1>{s.wordmark}</h1>
+    <ul class="link-list">
+      {
+        links.map((link) => (
+          <li>
+            <a href={link.href}>{link.label}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .links-page {
+    padding: clamp(3rem, 8vw, 5rem) var(--space-gutter) var(--space-section);
+    max-width: 32rem;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    margin-bottom: clamp(2rem, 5vw, 3rem);
+  }
+
+  .link-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .link-list a {
+    display: block;
+    padding: 1rem 1.5rem;
+    border: 1px solid var(--umber);
+    border-radius: 999px;
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  .link-list a:hover,
+  .link-list a:focus-visible {
+    background-color: var(--shade);
+    border-color: var(--gold);
+  }
+</style>
