@@ -1,6 +1,7 @@
 ---
-displayName: Couples & Engagements
+displayName: Family
+subtitle: Maternity, Family & Lifestyle
 order: 2
-blurb: The just-said-yes sessions — new rings, nervous laughter, and whatever light the evening decides to give us.
+blurb: Growing bellies, new siblings, backyard evenings — the everyday moments a family actually wants to remember.
 featuredCount: 8
 ---

@@ -57,6 +57,7 @@ const categories = defineCollection({
   schema: z
     .object({
       displayName: z.string(),
+      subtitle: z.string(),
       order: z.number().int(),
       blurb: z.string(),
       featuredCount: z.number().int().default(8),

@@ -9,26 +9,17 @@ const settings = await getEntry('site', 'settings');
 if (!settings) throw new Error('Missing src/content/site/settings.md');
 const s = settings.data;
 
-const categories = await getCollection('categories');
-const categoryById = new Map(categories.map((c) => [c.id, c]));
+const categories = (await getCollection('categories')).sort((a, b) => a.data.order - b.data.order);
+const allShoots = await getCollection('shoots');
 
-// Up to 4 featured covers, newest first, at most one per category when possible.
-const featuredShoots = (await getCollection('shoots', (e) => e.data.featured)).sort(byDateDesc);
-const picked: typeof featuredShoots = [];
-const seenCategories = new Set<string>();
-for (const shoot of featuredShoots) {
-  if (seenCategories.has(shoot.data.category.id)) continue;
-  seenCategories.add(shoot.data.category.id);
-  picked.push(shoot);
-  if (picked.length === 4) break;
-}
-if (picked.length < 4) {
-  for (const shoot of featuredShoots) {
-    if (picked.includes(shoot)) continue;
-    picked.push(shoot);
-    if (picked.length === 4) break;
-  }
-}
+// One card per category, newest cover image if the category has any shoots yet.
+const categoryCards = categories.map((category) => {
+  const inCategory = allShoots.filter((shoot) => shoot.data.category.id === category.id).sort(byDateDesc);
+  const pool = inCategory.some((shoot) => shoot.data.featured)
+    ? inCategory.filter((shoot) => shoot.data.featured)
+    : inCategory;
+  return { category, cover: pool[0]?.data.cover ?? null };
+});
 ---
 
 <Base title="" description={s.tagline} transparentNav>
@@ -39,34 +30,27 @@ if (picked.length < 4) {
     <p>{s.introText}</p>
   </section>
 
-  {
-    picked.length > 0 && (
-      <section class="featured" aria-label="Featured work">
-        <div class="featured-grid">
-          {picked.map((shoot) => {
-            const category = categoryById.get(shoot.data.category.id);
-            return (
-              <a class="feat-item" href={`/gallery/${shoot.data.category.id}`}>
-                <Image
-                  src={shoot.data.cover}
-                  alt={
-                    shoot.data.title
-                      ? `${shoot.data.title} — ${category?.data.displayName ?? shoot.data.category.id}`
-                      : (category?.data.displayName ?? shoot.data.category.id)
-                  }
-                  widths={[480, 828, 1280, 1600]}
-                  sizes="(min-width: 900px) 60vw, 100vw"
-                  loading="lazy"
-                />
-                <span class="eyebrow">{category?.data.displayName ?? shoot.data.category.id}</span>
-                {shoot.data.title && <span class="feat-title">{shoot.data.title}</span>}
-              </a>
-            );
-          })}
-        </div>
-      </section>
-    )
-  }
+  <section class="categories" aria-label="Galleries">
+    <div class="category-grid">
+      {
+        categoryCards.map(({ category, cover }) => (
+          <a class="cat-card" href={`/gallery/${category.id}`}>
+            {cover && (
+              <Image
+                src={cover}
+                alt={category.data.displayName}
+                widths={[480, 828, 1280]}
+                sizes="(min-width: 900px) 33vw, 100vw"
+                loading="lazy"
+              />
+            )}
+            <span class="cat-name">{category.data.displayName}</span>
+            <span class="cat-blurb">{category.data.subtitle}</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
 
   <section class="cta">
     <p class="cta-line">{s.ctaLine}</p>
@@ -92,40 +76,34 @@ if (picked.length < 4) {
     color: var(--umber);
   }
 
-  .featured {
+  .categories {
     padding: 0 var(--space-gutter) var(--space-section);
     max-width: 1400px;
     margin-inline: auto;
   }
 
-  .featured-grid {
+  .category-grid {
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    column-gap: clamp(1rem, 2.5vw, 2rem);
-    row-gap: clamp(3rem, 8vw, 6rem);
+    grid-template-columns: 1fr;
+    gap: clamp(2.5rem, 6vw, 4rem);
   }
 
-  .feat-item {
-    grid-column: 1 / -1;
+  .cat-card {
     display: block;
     text-decoration: none;
     color: inherit;
   }
 
-  .feat-item :global(img) {
+  .cat-card :global(img) {
     width: 100%;
     height: auto;
+    aspect-ratio: 4 / 5;
     object-fit: cover;
+    margin-bottom: 1.25rem;
   }
 
-  .feat-item .eyebrow {
+  .cat-name {
     display: block;
-    margin-top: 1rem;
-  }
-
-  .feat-title {
-    display: inline-block;
-    margin-top: 0.3rem;
     font-family: var(--font-display);
     font-size: 1.4rem;
     line-height: 1.2;
@@ -135,43 +113,19 @@ if (picked.length < 4) {
     transition: text-decoration-color 150ms ease;
   }
 
-  .feat-item:hover .feat-title {
+  .cat-card:hover .cat-name {
     text-decoration-color: var(--gold);
   }
 
-  @media (min-width: 900px) {
-    .feat-item:nth-child(4n + 1) {
-      grid-column: 1 / span 8;
-    }
+  .cat-blurb {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--umber);
+  }
 
-    .feat-item:nth-child(4n + 1) :global(img) {
-      aspect-ratio: 3 / 2;
-    }
-
-    .feat-item:nth-child(4n + 2) {
-      grid-column: 9 / span 4;
-      margin-top: clamp(3rem, 9vw, 7rem);
-    }
-
-    .feat-item:nth-child(4n + 2) :global(img) {
-      aspect-ratio: 4 / 5;
-    }
-
-    .feat-item:nth-child(4n + 3) {
-      grid-column: 1 / span 5;
-    }
-
-    .feat-item:nth-child(4n + 3) :global(img) {
-      aspect-ratio: 4 / 5;
-    }
-
-    .feat-item:nth-child(4n + 4) {
-      grid-column: 7 / span 6;
-      margin-top: clamp(2rem, 6vw, 4.5rem);
-    }
-
-    .feat-item:nth-child(4n + 4) :global(img) {
-      aspect-ratio: 3 / 2;
+  @media (min-width: 700px) {
+    .category-grid {
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 

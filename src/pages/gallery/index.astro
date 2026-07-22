@@ -19,7 +19,7 @@ const sections = categories.map((category) => {
   return { category, images };
 });
 
-const treeItems = categories.map((c) => ({ id: c.id, label: c.data.displayName }));
+const treeItems = categories.map((c) => ({ id: c.id, label: c.data.subtitle }));
 ---
 
 <Base title="Gallery" description="Selected work, by category.">
@@ -31,12 +31,12 @@ const treeItems = categories.map((c) => ({ id: c.id, label: c.data.displayName }
         sections.map(({ category, images }) => (
           <section class="cat-section" id={category.id}>
             <header class="cat-head">
-              <h2>{category.data.displayName}</h2>
+              <h2>{category.data.subtitle}</h2>
               <p class="blurb">{category.data.blurb}</p>
             </header>
             {images.length > 0 && <ImageGrid images={images} variant="masonry" />}
             <p class="view-all">
-              <a href={`/gallery/${category.id}`}>View all {category.data.displayName} →</a>
+              <a href={`/gallery/${category.id}`}>View all {category.data.subtitle} →</a>
             </p>
           </section>
         ))

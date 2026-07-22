@@ -19,13 +19,13 @@ const shoots = (
 ).sort(byDateDesc);
 ---
 
-<Base title={category.data.displayName} description={category.data.blurb}>
+<Base title={category.data.subtitle} description={category.data.blurb}>
   <div class="category-page">
     <p class="back">
       <a href="/gallery">← All work</a>
     </p>
     <header class="page-head">
-      <h1>{category.data.displayName}</h1>
+      <h1>{category.data.subtitle}</h1>
       <p class="blurb">{category.data.blurb}</p>
     </header>
 

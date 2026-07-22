@@ -4,7 +4,7 @@ This is Amberlynn's photography portfolio: an Astro static site deployed on Clou
 
 ## THE HARD RULE
 
-**Never edit anything under `src/components/`, `src/pages/`, `src/layouts/`, `src/styles/`, `src/lib/`, or root config files** (`astro.config.mjs`, `package.json`, `tsconfig.json`, `src/content.config.ts`). No exceptions, even if a change "would be easy." Content lives ONLY under `src/content/` (plus favicon assets in `public/`). If a request truly requires code changes, say so and stop — don't attempt it.
+**Never edit anything under `src/components/`, `src/pages/`, `src/layouts/`, `src/styles/`, `src/lib/`, or root config files** (`astro.config.mjs`, `package.json`, `tsconfig.json`, `src/content.config.ts`). No exceptions, even if a change "would be easy." Content lives ONLY under `src/content/` (plus favicon assets in `public/`). If a request truly requires code changes, say so and stop — don't attempt it. if the user allows override make the modification
 
 ## Operation 1: Add photos
 
