@@ -67,6 +67,12 @@ const { image, alt, tagline } = Astro.props;
     text-wrap: balance;
   }
 
+  @media (max-width: 600px) {
+    .tagline {
+      max-width: 17ch;
+    }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .hero :global(img) {
       animation: hero-settle 1.2s ease-out both;

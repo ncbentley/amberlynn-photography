@@ -6,11 +6,13 @@ Use Great Vibes for the site's expressive display typography while preserving Ka
 
 ## Typography Scope
 
-Great Vibes will replace Young Serif as the display font. It will apply to:
+Great Vibes will become the primary display font. It will apply to:
 
 - Page titles and section headings
 - The Amberlynn wordmark and other branding text
-- Hero taglines and prominent subtitle-style text
+- Prominent subtitle-style text outside the homepage
+
+The category card titles and subtitles on the homepage will retain their original Young Serif typography. The homepage hero tagline, intro title, CTA subtitle, and branding elements such as the Amberlynn wordmark will use Great Vibes.
 
 Karla will remain in use for:
 
@@ -21,19 +23,19 @@ Karla will remain in use for:
 
 ## Font Delivery
 
-Install and import Great Vibes through Fontsource, matching the site's existing self-hosted font setup. Remove the unused Young Serif dependency and import. This avoids a runtime request to an external font provider and keeps the font available as part of the built site.
+Install and import Great Vibes through Fontsource, matching the site's existing self-hosted font setup. Retain Young Serif as a second locally bundled display face for the homepage category titles and subtitles. This avoids runtime requests to external font providers and keeps both fonts available as part of the built site.
 
 Great Vibes is licensed under the SIL Open Font License and is permitted for commercial use.
 
 ## Implementation Boundaries
 
-Update the global display-font variable and selectively assign it to prominent subtitle elements that currently inherit the body font. Do not alter content, layout, imagery, colors, or unrelated typography. Retain cursive and serif fallbacks in the display-font stack.
+Update the global display-font variable for Great Vibes and add a separate homepage-category display-font variable for Young Serif. Assign the category variable only to the homepage category card titles and subtitles. Do not alter content, layout, imagery, colors, or unrelated typography. Retain appropriate fallbacks in both display-font stacks.
 
 Because Great Vibes has taller letterforms and pronounced flourishes, check headings and branding at desktop and mobile widths for clipping, overlap, and wrapping. Adjust typography spacing only where required for legibility.
 
 ## Verification
 
 - Run the production build.
-- Confirm the generated site includes Great Vibes locally and no longer bundles Young Serif.
+- Confirm the generated site includes both Great Vibes and Young Serif locally.
 - Inspect the homepage, gallery, category, contact, and links pages at desktop and mobile widths.
-- Confirm body copy, controls, navigation links, captions, and small labels remain in Karla.
+- Confirm homepage category titles and subtitles use Young Serif, other headings and branding use Great Vibes, and body copy, controls, navigation links, captions, and small labels remain in Karla.
