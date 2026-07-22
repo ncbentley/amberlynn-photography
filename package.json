@@ -14,6 +14,7 @@
     "@astrojs/mdx": "^7.0.3",
     "@fontsource-variable/karla": "^5.2.8",
     "@fontsource/great-vibes": "^5.3.0",
+    "@fontsource/young-serif": "^5.3.0",
     "astro": "^7.0.9",
     "sharp": "^0.35.3"
   }
