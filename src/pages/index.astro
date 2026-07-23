@@ -15,9 +15,7 @@ const allShoots = await getCollection('shoots');
 // One card per category, cycling through every image from its featured shoots.
 const categoryCards = categories.map((category) => {
   const inCategory = allShoots.filter((shoot) => shoot.data.category.id === category.id).sort(byDateDesc);
-  const pool = inCategory.some((shoot) => shoot.data.featured)
-    ? inCategory.filter((shoot) => shoot.data.featured)
-    : inCategory;
+  const pool = inCategory.filter((shoot) => shoot.data.featured);
   return { category, images: pool.flatMap((shoot) => shoot.data.images) };
 });
 ---
@@ -64,10 +62,31 @@ const categoryCards = categories.map((category) => {
 </Base>
 
 <script>
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const rotators = Array.from(document.querySelectorAll<HTMLElement>('[data-category-rotator]'));
+  const timerIds: number[] = [];
 
-  if (!reduceMotion) {
-    document.querySelectorAll<HTMLElement>('[data-category-rotator]').forEach((rotator, cardIndex) => {
+  const resetToFirstImage = () => {
+    rotators.forEach((rotator) => {
+      const images = Array.from(rotator.querySelectorAll('img'));
+      images.forEach((image, imageIndex) => image.classList.toggle('is-active', imageIndex === 0));
+    });
+  };
+
+  const stopRotation = () => {
+    timerIds.forEach((timerId) => {
+      window.clearTimeout(timerId);
+      window.clearInterval(timerId);
+    });
+    timerIds.length = 0;
+    resetToFirstImage();
+  };
+
+  const startRotation = () => {
+    stopRotation();
+    if (motionPreference.matches) return;
+
+    rotators.forEach((rotator, cardIndex) => {
       const images = Array.from(rotator.querySelectorAll('img'));
       if (images.length < 2) return;
 
@@ -78,12 +97,16 @@ const categoryCards = categories.map((category) => {
         images[activeIndex].classList.add('is-active');
       };
 
-      window.setTimeout(() => {
+      const startTimer = window.setTimeout(() => {
         advance();
-        window.setInterval(advance, 4000);
+        timerIds.push(window.setInterval(advance, 4000));
       }, 4000 + cardIndex * 350);
+      timerIds.push(startTimer);
     });
-  }
+  };
+
+  motionPreference.addEventListener('change', startRotation);
+  startRotation();
 </script>
 
 <style>
